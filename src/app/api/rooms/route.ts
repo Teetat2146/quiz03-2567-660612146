@@ -1,46 +1,51 @@
-import { DB, readDB, writeDB } from "@lib/DB";
+import { Database, DB, readDB, writeDB } from "@lib/DB";
 import { checkToken } from "@lib/checkToken";
 import { nanoid } from "nanoid";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async () => {
   readDB();
+  //const room = (<Database>DB).rooms;
   return NextResponse.json({
     ok: true,
-    //rooms:
-    //totalRooms:
+    rooms: (<Database>DB).rooms,
+    totalRooms: (<Database>DB).rooms.length
   });
 };
 
 export const POST = async (request: NextRequest) => {
   const payload = checkToken();
-
-  // return NextResponse.json(
-  //   {
-  //     ok: false,
-  //     message: "Invalid token",
-  //   },
-  //   { status: 401 }
-  // );
-
+  if(!payload){
+      return NextResponse.json(
+      {
+        ok: false,
+        message: "Invalid token",
+      },
+      { status: 401 }
+    );
+  }
   readDB();
-
-  // return NextResponse.json(
-  //   {
-  //     ok: false,
-  //     message: `Room ${"replace this with room name"} already exists`,
-  //   },
-  //   { status: 400 }
-  // );
-
+  const body = await request.json();
+  const { roomName } = body;
+  const found_roomName = (<Database>DB).rooms.find((r) => r.roomName === roomName)
+  if(found_roomName){
+    return NextResponse.json(
+      {
+        ok: false,
+        message: `Room ${"replace this with room name"} already exists`,
+      },
+      { status: 400 }
+    );
+  }
+ 
   const roomId = nanoid();
-
+  (<Database>DB).rooms.push(body);
   //call writeDB after modifying Database
   writeDB();
 
   return NextResponse.json({
     ok: true,
     //roomId,
-    message: `Room ${"replace this with room name"} has been created`,
+    message: `Room ${body.roomName} has been created`,
   });
 };
