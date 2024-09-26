@@ -39,7 +39,7 @@ export const POST = async (request: NextRequest) => {
   }
  
   const roomId = nanoid();
-  (<Database>DB).rooms.push(body);
+  (<Database>DB).rooms.push({roomId,roomName});
   //call writeDB after modifying Database
   writeDB();
 
