@@ -32,7 +32,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(
       {
         ok: false,
-        message: `Room ${"replace this with room name"} already exists`,
+        message: `Room ${body.roomName} already exists`,
       },
       { status: 400 }
     );
